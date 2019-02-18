@@ -143,6 +143,20 @@ class OneStageGA extends GA {
       if (index < 0) index = Math.abs(index + 1);
       selectedMembers.add(members.get(index));
     }
+    return selectedMembers;
+  }
+  
+  @Override
+  public void generateNextGen() {
+    this.members = rouletteSelect();
+    crossover();
+    mutate();
+  }
+  
+  @Override
+  public Circle getFittest() {
+    Collections.sort(this.members, new SortByRadius());
+    return this.members.get(0);
   }
 }
 
@@ -155,4 +169,10 @@ class TwoStageGA extends GA {
   public void generateFirstGen() {
     
   }  
+}
+
+class SortByRadius implements Comparator<Circle> {
+  public int compare(Circle a, Circle b) {
+    return b.radius - a.radius; 
+  }
 }
