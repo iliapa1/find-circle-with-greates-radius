@@ -84,22 +84,6 @@ class RandomNonCollidingCircle extends Circle {
 //Instead of "circle" everywhere, rework this to use a template/generic
 //https://docs.oracle.com/javase/tutorial/java/generics/types.html
 abstract class GA {
-  public List<Circle> allOtherCircles;
-  public List<Circle> members;
-  public int membersInPopulation;
-  public int generationCounter;
-  public float crossoverRate;
-  public float mutationRate;
-  
-  public GA(List<Circle> allOtherCircles, int membersInPopulation, float crossoverRate, float mutationRate) {
-    this.allOtherCircles = allOtherCircles;
-    this.members = new ArrayList<Circle>(membersInPopulation);
-    this.membersInPopulation = membersInPopulation;
-    this.generationCounter = 0;
-    this.crossoverRate = crossoverRate;
-    this.mutationRate = mutationRate;
-  }
-  
   public abstract void assignFitness();
   public abstract ArrayList<Circle> rouletteSelect();
   public abstract void mutate();
@@ -109,15 +93,25 @@ abstract class GA {
   public abstract Circle getFittest();
 }
 
-class OneStageGA extends GA {
+class OneStageGA {
+  public List<Circle> allOtherCircles;
+  public List<Circle> members;
+  public int membersInPopulation;
+  public int generationCounter;
+  public float crossoverRate;
+  public float mutationRate;
   public int maxRadius;
   
   public OneStageGA(List<Circle> allOtherCircles, int membersInPopulation, float crossoverRate, float mutationRate, int maxRadius) {
-    super(allOtherCircles, membersInPopulation, crossoverRate, mutationRate);
+    this.allOtherCircles = allOtherCircles;
+    this.members = new ArrayList<Circle>(membersInPopulation);
+    this.membersInPopulation = membersInPopulation;
+    this.generationCounter = 0;
+    this.crossoverRate = crossoverRate;
+    this.mutationRate = mutationRate;
     this.maxRadius = maxRadius;
   }
 
-  @Override
   public void generateFirstGen() {
      members.clear();
      for (int i = 0; i < membersInPopulation; i++) {
@@ -129,7 +123,6 @@ class OneStageGA extends GA {
     //The radius is the fitness of a member(Circle)
   }
   
-  @Override
   public ArrayList<Circle> rouletteSelect() {
     List<Circle> selectedMembers = new ArrayList<Circle>(membersInPopulation);
     List<Float> cumulativeFitness = new ArrayList<Float>();
@@ -146,29 +139,34 @@ class OneStageGA extends GA {
     return selectedMembers;
   }
   
-  @Override
-  public void generateNextGen() {
-    this.members = rouletteSelect();
-    crossover();
-    mutate();
+  public void crossoverCurrentPop() {
+    List<Circle> newMembers = new ArrayList<Circle>();
+    for (int i = 0; i < this.members.length(); i+=2) {
+      if (ThreadLocalRandom.current().nextFloat(0, 1) < crossoverRate) {
+        
+      }
+      else {
+        newMembers.add(this.members.get(i));
+        newMembers.add(this.members.get(i+1));
+      }
+      
+    }
   }
   
-  @Override
+  public void mutateCurrentPop() {
+    
+  }
+  
+  public void generateNextGen() {
+    this.members = rouletteSelect();
+    crossoverCurrentPop();
+    mutateCurrentPop();
+  }
+  
   public Circle getFittest() {
     Collections.sort(this.members, new SortByRadius());
     return this.members.get(0);
   }
-}
-
-class TwoStageGA extends GA {
-  
-  public TwoStageGA() {
-    
-  }
-  
-  public void generateFirstGen() {
-    
-  }  
 }
 
 class SortByRadius implements Comparator<Circle> {
