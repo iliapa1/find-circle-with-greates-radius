@@ -180,7 +180,20 @@ class OneStageGA {
   }
   
   public void mutateCurrentPop() {
-    
+    for (Circle c : this.members) {
+       List<Integer> params = getParamsOfMember(c);
+       for (Integer param : params) {
+         String paramAsStr = String.valueOf(param);
+         for (int i = 0; i < paramAsStr.length(); i++) {
+           if (ThreadLocalRandom.current().nextFloat() < this.mutationRate) {
+             char[] paramAsChars = paramAsStr.toCharArray();
+             paramAsChar[i] = (char) ThreadLocalRandom.current().nextInt(10);
+             paramAsStr = String.valueOf(paramAsChars);
+           }
+         }
+         param = Integer.parseInt(paramAsStr);
+       }
+    }
   }
   
   public void generateNextGen() {
