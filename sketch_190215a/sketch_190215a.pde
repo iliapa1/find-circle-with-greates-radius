@@ -32,10 +32,10 @@ void draw() {
 }
 
 class Circle {
-  public float x, y;
-  public float radius;
+  public int x, y;
+  public int radius;
   
-  public Circle(float x, float y, float radius) {
+  public Circle(int x, int y, int radius) {
     this.x = x;
     this.y = y;
     this.radius = radius;
@@ -83,15 +83,6 @@ class RandomNonCollidingCircle extends Circle {
 
 //Instead of "circle" everywhere, rework this to use a template/generic
 //https://docs.oracle.com/javase/tutorial/java/generics/types.html
-abstract class GA {
-  public abstract void assignFitness();
-  public abstract ArrayList<Circle> rouletteSelect();
-  public abstract void mutate();
-  public abstract void crossover();
-  public abstract void generateFirstGen();
-  public abstract void generateNextGen();
-  public abstract Circle getFittest();
-}
 
 class OneStageGA {
   public List<Circle> allOtherCircles;
@@ -139,11 +130,46 @@ class OneStageGA {
     return selectedMembers;
   }
   
+  private List<Integer> getParamsOfMember(Circle m) {
+    List<Integer> params = new ArrayList<Integer>();
+    params.add(m.x);
+    params.add(m.y);
+    params.add(m.radius);
+    return params;
+  }
+  
+  private Circle breed(Circle member1, Circle member2) {
+    List<Integer> mem1Params = getParamsOfMember(member1);
+    List<Integer> mem2Params = getParamsOfMember(member2);
+    List<Integer> newMemParams = new ArrayList<Integer>();
+    for (int i = 0; i < mem1Params.length(); i++) {
+      String mem1ParamAsStr = String.valueOf(mem1Params.get(i));
+      String mem2ParamAsStr = String.valueOf(mem2Params.get(i));
+      //Makes the string equal length, filling up the smaller one with 0s to the left
+      if (mem1ParamAsStr.length() > mem2ParamAsStr.length()) {
+        while (mem1ParamAsStr.length() != mem2ParamAsStr.length()) {
+          mem2ParamAsStr = "0" + mem2ParamAsStr; 
+        }
+      } else {
+        while (mem1ParamAsStr.length() != mem2ParamAsStr.length()) {
+          mem1ParamAsStr = "0" + mem1ParamAsStr; 
+        }
+      }
+      String newParamAsString = new String();
+      for (int j = 0; j < mem1ParamAsStr.length(); j++) {
+         (ThreadLocalRandom.current().nextFloat(0, 1) < 0.5) ? newParamAsString = newParamAsString + mem1ParamAsStr.charAt(i) : newParamAsString = newParamAsString + mem2ParamAsStr.charAt(i)
+      }
+      newMemParams.add(Integer.parseInt(newParamAsString));
+    }
+    return new Circle(newMemParams.get(0), newMemParams.get(1), newMemParams.get(2));
+  }
+  
   public void crossoverCurrentPop() {
     List<Circle> newMembers = new ArrayList<Circle>();
     for (int i = 0; i < this.members.length(); i+=2) {
-      if (ThreadLocalRandom.current().nextFloat(0, 1) < crossoverRate) {
-        
+      if (ThreadLocalRandom.current().nextDouble(1) < crossoverRate) {
+        newMembers.add(breed(this.members.get(i), this.members.get(i+)));
+        newMembers.add(breed(this.members.get(i), this.members.get(i+)));
       }
       else {
         newMembers.add(this.members.get(i));
