@@ -29,6 +29,12 @@ void draw() {
    for (Circle c : allCircles) {
       c.draw(); 
    }
+   OneStageGA ga = new OneStageGA(allCircles, 20, 0.7, 0.01, 300);
+   ga.generateFirstGen();
+   for (int i = 0; i < 1000; i++) {
+     ga.generateNextGen(); 
+   }
+   ga.getFittest().draw();
 }
 
 class Circle {
@@ -106,7 +112,7 @@ class OneStageGA {
   public void generateFirstGen() {
      members.clear();
      for (int i = 0; i < membersInPopulation; i++) {
-       members.add(new RandomNonCollidingCircle(1, maxRadius, allOtherCircles));
+       members.add(new RandomNonCollidingCircle(1, this.maxRadius, this.allOtherCircles));
      }
   }
   
@@ -157,7 +163,7 @@ class OneStageGA {
       }
       String newParamAsString = new String();
       for (int j = 0; j < mem1ParamAsStr.length(); j++) {
-         newParamAsString = (ThreadLocalRandom.current().nextDouble(1) < 0.5) ? newParamAsString + mem1ParamAsStr.charAt(i) : newParamAsString + mem2ParamAsStr.charAt(i);
+         newParamAsString = (ThreadLocalRandom.current().nextDouble(1) < 0.5) ? newParamAsString + mem1ParamAsStr.charAt(j) : newParamAsString + mem2ParamAsStr.charAt(j);
       }
       newMemParams.add(Integer.parseInt(newParamAsString));
     }
