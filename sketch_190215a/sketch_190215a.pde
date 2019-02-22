@@ -114,15 +114,15 @@ class OneStageGA {
     //The radius is the fitness of a member(Circle)
   }
   
-  public ArrayList<Circle> rouletteSelect() {
+  public List<Circle> rouletteSelect() {
     List<Circle> selectedMembers = new ArrayList<Circle>(membersInPopulation);
-    List<Float> cumulativeFitness = new ArrayList<Float>();
+    List<Integer> cumulativeFitness = new ArrayList<Integer>();
     cumulativeFitness.add(members.get(0).radius);
     for (int i = 1; i < membersInPopulation; i++) {
       cumulativeFitness.add(members.get(i-1).radius + members.get(i).radius);
     }
     for (int i = 0; i < membersInPopulation; i++) {
-      float randomFitness = ThreadLocalRandom.current().nextFloat(0, cumulativeFitness.get(cumulativeFitness.size() - 1));
+      int randomFitness = ThreadLocalRandom.current().nextInt(0, cumulativeFitness.get(cumulativeFitness.size() - 1));
       int index = Collections.binarySearch(cumulativeFitness, randomFitness);
       if (index < 0) index = Math.abs(index + 1);
       selectedMembers.add(members.get(index));
@@ -142,7 +142,7 @@ class OneStageGA {
     List<Integer> mem1Params = getParamsOfMember(member1);
     List<Integer> mem2Params = getParamsOfMember(member2);
     List<Integer> newMemParams = new ArrayList<Integer>();
-    for (int i = 0; i < mem1Params.length(); i++) {
+    for (int i = 0; i < mem1Params.size(); i++) {
       String mem1ParamAsStr = String.valueOf(mem1Params.get(i));
       String mem2ParamAsStr = String.valueOf(mem2Params.get(i));
       //Makes the string equal length, filling up the smaller one with 0s to the left
@@ -157,7 +157,7 @@ class OneStageGA {
       }
       String newParamAsString = new String();
       for (int j = 0; j < mem1ParamAsStr.length(); j++) {
-         (ThreadLocalRandom.current().nextFloat(0, 1) < 0.5) ? newParamAsString = newParamAsString + mem1ParamAsStr.charAt(i) : newParamAsString = newParamAsString + mem2ParamAsStr.charAt(i)
+         newParamAsString = (ThreadLocalRandom.current().nextDouble(1) < 0.5) ? newParamAsString + mem1ParamAsStr.charAt(i) : newParamAsString + mem2ParamAsStr.charAt(i);
       }
       newMemParams.add(Integer.parseInt(newParamAsString));
     }
@@ -166,10 +166,10 @@ class OneStageGA {
   
   public void crossoverCurrentPop() {
     List<Circle> newMembers = new ArrayList<Circle>();
-    for (int i = 0; i < this.members.length(); i+=2) {
+    for (int i = 0; i < this.members.size(); i+=2) {
       if (ThreadLocalRandom.current().nextDouble(1) < crossoverRate) {
-        newMembers.add(breed(this.members.get(i), this.members.get(i+)));
-        newMembers.add(breed(this.members.get(i), this.members.get(i+)));
+        newMembers.add(breed(this.members.get(i), this.members.get(i+1)));
+        newMembers.add(breed(this.members.get(i), this.members.get(i+1)));
       }
       else {
         newMembers.add(this.members.get(i));
@@ -187,7 +187,7 @@ class OneStageGA {
          for (int i = 0; i < paramAsStr.length(); i++) {
            if (ThreadLocalRandom.current().nextFloat() < this.mutationRate) {
              char[] paramAsChars = paramAsStr.toCharArray();
-             paramAsChar[i] = (char) ThreadLocalRandom.current().nextInt(10);
+             paramAsChars[i] = (char) ThreadLocalRandom.current().nextInt(10);
              paramAsStr = String.valueOf(paramAsChars);
            }
          }
