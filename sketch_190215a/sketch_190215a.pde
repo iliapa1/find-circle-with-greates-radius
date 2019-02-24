@@ -11,11 +11,18 @@ int MAX_CIRCLE_RADIUS = 70;
 int MIN_CIRCLE_RADIUS = 15;
 int STOP_AFTER_GEN = 10000;
 
+OneStageGA ga;
+
 void setup() {
   allCircles = new ArrayList<Circle>();
   for (int i = 0; i < INITIAL_CIRCLE_COUNT; i++) {
      RandomNonCollidingCircle temp = new RandomNonCollidingCircle(MIN_CIRCLE_RADIUS, MAX_CIRCLE_RADIUS, allCircles);
      allCircles.add(temp);
+   }
+   ga = new OneStageGA(allCircles, 20, 0.7, 0.01, 300);
+   ga.generateFirstGen();
+   for (int i = 0; i < 1000; i++) {
+     ga.generateNextGen(); 
    }
 }
 
@@ -25,16 +32,12 @@ void settings() {
 
 
 void draw() {
-   
+   background(255);
    for (Circle c : allCircles) {
       c.draw(); 
    }
-   OneStageGA ga = new OneStageGA(allCircles, 20, 0.7, 0.01, 300);
-   ga.generateFirstGen();
-   for (int i = 0; i < 1000; i++) {
-     ga.generateNextGen(); 
-   }
-   ga.getFittest().draw();
+   
+   ga.getFittest().drawColor();
 }
 
 class Circle {
@@ -54,6 +57,11 @@ class Circle {
   }
   
   public void draw() {
+    circle(x, y, radius);
+  }
+  
+  public void drawColor() {
+    fill(255, 0, 0);
     circle(x, y, radius);
   }
   
