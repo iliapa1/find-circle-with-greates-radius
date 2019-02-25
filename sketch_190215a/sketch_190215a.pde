@@ -223,6 +223,7 @@ class OneStageGA {
 }
 
 class SortByRadius implements Comparator<Circle> {
+  @Override
   public int compare(Circle a, Circle b) {
     return b.radius - a.radius; 
   }
